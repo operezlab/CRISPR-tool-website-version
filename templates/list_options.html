@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Select Target</title>
+</head>
+<body>
+    <h1>Select Target</h1>
+    <form id="selectionForm">
+        <label for="selected_row">Enter Row Number:</label>
+        <input type="number" id="selected_row" name="selected_row">
+        <input type="submit" value="Submit">
+    </form>
+    <div id="result"></div>
+
+    <script>
+        document.getElementById('selectionForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const formData = new FormData(this);
+            fetch('/select_target', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    document.getElementById('result').innerHTML = `
+                        <p>Selected target sequence: ${data.selected_target_seq}</p>
+                        <p>Selected orientation: ${data.selected_orientation}</p>
+                        <p>Selected distance from exon: ${data.selected_distance_from_exon}</p>
+                    `;
+                } else {
+                    document.getElementById('result').innerHTML = `<p>${data.message}</p>`;
+                }
+            });
+        });
+    </script>
+</body>
+</html>

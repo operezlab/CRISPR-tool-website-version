@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRISPR DataFrame</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('.select-btn').click(function() {
+                const rowIndex = $(this).data('index');
+                const geneIds = $(this).data('gene-ids');
+                
+                $.post('/select_row', { row_index: rowIndex, gene_ids: geneIds }, function(response) {
+                    if (response.status === 'success') {
+                        // Redirect to the processed output page
+                        window.location.href = response.redirect_url;
+                    } else {
+                        alert('Error: ' + response.message);
+                    }
+                }, 'json');
+            });
+        });
+    </script>
+    <style>
+        /* Make the table responsive */
+        .table-container {
+            overflow-x: auto;
+            margin-bottom: 20px;
+        }
+
+        table {
+            width: 100%;
+            table-layout: auto;
+            white-space: nowrap;
+        }
+
+        th, td {
+            text-align: center;
+            padding: 10px;
+        }
+
+        th:last-child, td:last-child {
+            min-width: 150px;
+        }
+
+        /* Adjusting the body to prevent extra overflow */
+        body {
+            overflow-x: hidden;
+        }
+
+        /* Ensuring the table is scrollable but within a constrained width */
+        .table-wrapper {
+            max-width: 100%;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid mt-5">
+        <h1 class="text-center">CRISPR DataFrame</h1>
+        <div class="table-wrapper">
+            <div class="table-container">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            {% if df %}
+                                {% for col in df[0].keys() %}
+                                    <th>{{ col }}</th>
+                                {% endfor %}
+                                <th>Select</th>
+                            {% endif %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in df %}
+                        <tr>
+                            {% for col, value in row.items() %}
+                                <td>{{ value }}</td>
+                            {% endfor %}
+                            <td>
+                                <button class="btn btn-primary select-btn" 
+                                        data-index="{{ loop.index0 }}"
+                                        data-gene-ids="{{ gene_ids }}">
+                                    Select
+                                </button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

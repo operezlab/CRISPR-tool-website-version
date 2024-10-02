@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Processing Progress</title>
+    <script>
+        function updateProgress() {
+            fetch('/progress_status')
+                .then(response => response.json())
+                .then(data => {
+                    let progressBar = document.getElementById('progress-bar');
+                    let progressText = document.getElementById('progress-text');
+
+                    // Update progress bar and text
+                    progressBar.style.width = data.progress + '%';
+                    progressText.innerText = data.progress + '% complete';
+
+                    // If progress reaches 100%, redirect to the dataframe page
+                    if (data.progress >= 100) {
+                        window.location.href = '/dataframe/' + "{{ gene_ids }}";  // Redirect to dataframe view
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching progress:', error);
+                });
+        }
+
+        var progressInterval = setInterval(updateProgress, 1000);  // Check progress every second
+    </script>
+</head>
+<body>
+    <h1>Processing Gene IDs: {{ gene_ids }}</h1>
+
+    <!-- Progress bar container -->
+    <div style="width: 100%; background-color: #f3f3f3;">
+        <div id="progress-bar" style="width: 0%; height: 30px; background-color: #4caf50;"></div>
+    </div>
+
+    <!-- Progress text -->
+    <p id="progress-text">0% complete</p>
+
+    <!-- Completion message -->
+    <p id="message">Processing your data...</p>
+</body>
+</html>
